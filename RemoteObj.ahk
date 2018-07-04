@@ -12,7 +12,7 @@
 	OnAccept(Server)
 	{
 		Sock := Server.Accept()
-		Text := Sock.RecvText()
+		Text := Sock.RecvLine()
 		Query := Jxon_Load(Text)
 		
 		if (Query.Action == "__Get")
@@ -22,7 +22,7 @@
 		else if (Query.Action == "__Call")
 			RetVal := this.Obj[Query.Name].Call(this.Obj, Query.Params*)
 		
-		Sock.SendText(Jxon_Dump({"RetVal": RetVal}))
+		Sock.SendText(Jxon_Dump({"RetVal": RetVal}) "`r`n")
 		Sock.Disconnect()
 	}
 }
@@ -54,8 +54,8 @@ RemoteObjSend(Addr, Obj)
 {
 	Sock := new SocketTCP()
 	Sock.Connect(Addr)
-	Sock.SendText(Jxon_Dump(Obj))
-	RetVal := Jxon_Load(Sock.RecvText()).RetVal
+	Sock.SendText(Jxon_Dump(Obj) "`r`n")
+	RetVal := Jxon_Load(Sock.RecvLine()).RetVal
 	Sock.Disconnect()
 	return RetVal
 }
